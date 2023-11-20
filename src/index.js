@@ -23,14 +23,14 @@ const validate = (fields, array) => {
 };
 
 const render = () => (path, value) => {
-  if (path === 'status') {
-    if (value === 'invalid') {
-      inputEl.classList.add('is-invalid');
-    } else if (value === 'valid') {
-      inputEl.classList.remove('is-invalid');
-      inputEl.focus();
-      // formEl.reset();
-    }
+  if (path === 'errors' && value) {
+    inputEl.classList.add('is-invalid');
+    document.querySelector('.feedback').textContent = value;
+  } else if (path === 'status' && value === 'valid') {
+    inputEl.classList.remove('is-invalid');
+    inputEl.focus();
+    formEl.reset();
+    document.querySelector('.feedback').textContent = '';
   }
 };
 
@@ -40,10 +40,9 @@ formEl.addEventListener('submit', (e) => {
   e.preventDefault();
   const formData = new FormData(e.target);
   const url = formData.get('url');
-  const validation = validate(url, state.urls);
-  console.log(validation);
-  if (validation) {
-    watchedState.errors = validation;
+  const validationError = validate(url, state.urls);
+  if (validationError) {
+    watchedState.errors = validationError;
     watchedState.status = 'invalid';
   } else {
     watchedState.errors = '';
