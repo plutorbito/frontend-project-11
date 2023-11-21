@@ -12,14 +12,9 @@ const state = {
   urls: [],
 };
 
-const validate = (fields, array) => {
+const validate = (field, array) => {
   const schema = yup.string().url().required().notOneOf(array);
-  try {
-    schema.validateSync(fields, { abortEarly: false });
-    return '';
-  } catch (e) {
-    return e.message;
-  }
+  return schema.validate(field);
 };
 
 const render = () => (path, value) => {
@@ -40,14 +35,15 @@ formEl.addEventListener('submit', (e) => {
   e.preventDefault();
   const formData = new FormData(e.target);
   const url = formData.get('url');
-  const validationError = validate(url, state.urls);
-  if (validationError) {
-    watchedState.errors = validationError;
-    watchedState.status = 'invalid';
-  } else {
-    watchedState.errors = '';
-    watchedState.urls.push(url);
-    watchedState.status = 'valid';
-  }
-  console.log(state);
+  validate(url, state.urls)
+    .then(() => {
+      watchedState.errors = '';
+      watchedState.status = 'valid';
+      watchedState.urls.push(url);
+    })
+    .catch((error) => {
+      watchedState.errors = error.message;
+      watchedState.status = 'invalid';
+    })
+    .then(() => console.log(state));
 });
