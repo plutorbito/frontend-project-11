@@ -7,6 +7,7 @@ import i18next from 'i18next';
 import resources from './locales/ru.js';
 import getDataFromUrl from './getDataFromUrl.js';
 import parseDataFromUrl from './parseDataFromUrl.js';
+import _ from 'lodash';
 
 const elements = {
   formEl: document.querySelector('.rss-form'),
@@ -35,6 +36,19 @@ const handleErrors = (error, watchedState) => {
   watchedState.status = 'invalid';
 };
 
+const getFeedsWithIds = (feeds, feedId) => {
+  return feeds.map((feed) => {
+    return { ...feed, feedId: feedId };
+  });
+};
+
+const getPostsWithIds = (posts, feedId) => {
+  return posts.map((post) => {
+    const postId = _.uniqueId();
+    return { ...post, feedId: feedId, postid: postId };
+  });
+};
+
 export default () => {
   const defaultLanguage = 'ru';
   const i18nextInstance = i18next.createInstance();
@@ -58,6 +72,32 @@ export default () => {
 
       const watchedState = onChange(state, render(elements, i18nextInstance));
 
+      const checkForNewPosts = () => {
+        watchedState.feeds.forEach((feed) => {
+          getDataFromUrl(feed.url)
+            .then((data) => {
+              const { posts: newPosts } = parseDataFromUrl(data, feed.url);
+              const filteredNewPosts = newPosts.filter((post) => {
+                return !watchedState.posts.some(
+                  (existingPost) => existingPost.postLink === post.postLink
+                );
+              });
+              if (filteredNewPosts.length > 0) {
+                const newPostsWithIds = getPostsWithIds(
+                  filteredNewPosts,
+                  feed.feedId
+                );
+                watchedState.posts.push(...newPostsWithIds);
+                render(elements, i18nextInstance);
+              }
+            })
+            .catch((error) => handleErrors(error, watchedState));
+        });
+        setTimeout(checkForNewPosts, 5000);
+      };
+
+      checkForNewPosts();
+
       elements.formEl.addEventListener('submit', (e) => {
         e.preventDefault();
         const formData = new FormData(e.target);
@@ -69,9 +109,14 @@ export default () => {
               .then((data) => {
                 watchedState.feedback = 'validation.success';
                 watchedState.status = 'valid';
+
                 const { feeds, posts } = parseDataFromUrl(data, url);
-                watchedState.feeds.push(feeds);
-                watchedState.posts.push(...posts);
+                const feedId = _.uniqueId();
+                const feedsWithIds = getFeedsWithIds(feeds, feedId);
+                const postsWithIds = getPostsWithIds(posts, feedId);
+
+                watchedState.feeds.push(...feedsWithIds);
+                watchedState.posts.push(...postsWithIds);
               })
               .catch((error) => {
                 handleErrors(error, watchedState);
