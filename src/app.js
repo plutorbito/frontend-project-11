@@ -5,25 +5,37 @@ import onChange from 'on-change';
 import render from './view.js';
 import i18next from 'i18next';
 import resources from './locales/ru.js';
+import getDataFromUrl from './getDataFromUrl.js';
+import parseDataFromUrl from './parseDataFromUrl.js';
+
+const elements = {
+  formEl: document.querySelector('.rss-form'),
+  inputEl: document.querySelector('#url-input'),
+  feedbackEl: document.querySelector('.feedback'),
+  feedsEl: document.querySelector('.feeds'),
+  postsEl: document.querySelector('.posts'),
+};
+
+const state = {
+  status: '',
+  feedback: '',
+  feeds: [],
+  posts: [],
+};
+
+const validate = (field, array) => {
+  const schema = yup.string().url().required().notOneOf(array);
+  return schema.validate(field);
+};
+
+const handleErrors = (error, watchedState) => {
+  error.message === 'Failed to fetch'
+    ? (watchedState.feedback = 'validation.connectionError')
+    : (watchedState.feedback = error.message);
+  watchedState.status = 'invalid';
+};
 
 export default () => {
-  const elements = {
-    formEl: document.querySelector('.rss-form'),
-    inputEl: document.querySelector('#url-input'),
-    feedbackEl: document.querySelector('.feedback'),
-  };
-
-  const state = {
-    status: '',
-    errors: '',
-    urls: [],
-  };
-
-  const validate = (field, array) => {
-    const schema = yup.string().url().required().notOneOf(array);
-    return schema.validate(field);
-  };
-
   const defaultLanguage = 'ru';
   const i18nextInstance = i18next.createInstance();
   i18nextInstance
@@ -35,32 +47,40 @@ export default () => {
     .then(() => {
       yup.setLocale({
         mixed: {
-          default: i18nextInstance.t('validation.default'),
-          notOneOf: i18nextInstance.t('validation.notOneOf'),
+          default: 'validation.default',
+          notOneOf: 'validation.notOneOf',
         },
         string: {
-          required: i18nextInstance.t('validation.required'),
-          url: i18nextInstance.t('validation.url'),
+          required: 'validation.required',
+          url: 'validation.invalidUrl',
         },
       });
 
-      const watchedState = onChange(state, render(elements));
+      const watchedState = onChange(state, render(elements, i18nextInstance));
 
       elements.formEl.addEventListener('submit', (e) => {
         e.preventDefault();
         const formData = new FormData(e.target);
         const url = formData.get('url');
-        validate(url, state.urls)
+        const urlsArray = watchedState.feeds.map((feed) => feed.url);
+        validate(url, urlsArray)
           .then(() => {
-            watchedState.errors = '';
-            watchedState.status = 'valid';
-            watchedState.urls.push(url);
+            getDataFromUrl(url)
+              .then((data) => {
+                watchedState.feedback = 'validation.success';
+                watchedState.status = 'valid';
+                const { feeds, posts } = parseDataFromUrl(data, url);
+                watchedState.feeds.push(feeds);
+                watchedState.posts.push(...posts);
+              })
+              .catch((error) => {
+                handleErrors(error, watchedState);
+              });
           })
-          .catch((error) => {
-            watchedState.errors = error.message;
-            watchedState.status = 'invalid';
-          })
-          .then(() => console.log(state));
+          .catch((error) => handleErrors(error, watchedState))
+          .then(() => {
+            console.log(state);
+          });
       });
     });
 };
