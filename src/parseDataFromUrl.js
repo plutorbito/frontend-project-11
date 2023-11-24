@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 export default (data, url) => {
   const parser = new DOMParser();
   const doc = parser.parseFromString(data, 'text/html');
