@@ -12,7 +12,8 @@ export default (data, url) => {
   const posts = Array.from(items).map((item) => {
     const postLink = item.querySelector('link').textContent;
     const postTitle = item.querySelector('title').textContent;
-    return { postTitle, postLink };
+    const postDescription = item.querySelector('description').textContent;
+    return { postTitle, postLink, postDescription };
   });
   const feeds = [{ feedTitle, feedDescription, url }];
   return { feeds, posts };
