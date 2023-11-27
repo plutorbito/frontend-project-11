@@ -10,9 +10,7 @@ export default (data, url) => {
   const feedDescription = doc.querySelector('description').textContent;
   const items = doc.querySelectorAll('item');
   const posts = Array.from(items).map((item) => {
-    const postLink = item
-      .querySelector('link')
-      .nextSibling.textContent.split('\\n')[0];
+    const postLink = item.querySelector('link').nextSibling.textContent.trim();
     const postTitle = item.querySelector('title').textContent;
     return { postTitle, postLink };
   });

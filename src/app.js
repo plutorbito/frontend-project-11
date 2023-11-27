@@ -30,7 +30,7 @@ const validate = (field, array) => {
 };
 
 const handleErrors = (error, watchedState) => {
-  error.message === 'Failed to fetch'
+  error.name === 'AxiosError'
     ? (watchedState.feedback = 'validation.connectionError')
     : (watchedState.feedback = error.message);
   watchedState.status = 'invalid';
