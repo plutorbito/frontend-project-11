@@ -19,6 +19,17 @@ const createCardElements = (container, i18nextInstance, title) => {
   return ulEl;
 };
 
+const createBtn = (id, i18nextInstance) => {
+  const btnEl = document.createElement('button');
+  btnEl.type = 'button';
+  btnEl.classList.add('btn', 'btn-outline-primary', 'btn-sm');
+  btnEl.dataset.id = id;
+  btnEl.dataset.bsToggle = 'modal';
+  btnEl.dataset.bsTarget = '#modal';
+  btnEl.textContent = i18nextInstance.t('rss.viewBtn');
+  return btnEl;
+};
+
 export default (elements, i18nextInstance) => (path, value) => {
   const cardTitle = `rss.${path}`;
   switch (path) {
@@ -86,10 +97,14 @@ export default (elements, i18nextInstance) => (path, value) => {
         postAEl.href = el.postLink;
         postAEl.textContent = el.postTitle;
         postAEl.classList.add('fw-bold');
-        postAEl.dataset.id = el.id;
+        postAEl.dataset.id = el.postId;
         postAEl.target = '_blank';
         postAEl.rel = 'noopener noreferrer';
         postLiEl.append(postAEl);
+
+        const btnEl = createBtn(el.postId, i18nextInstance);
+        postLiEl.append(btnEl);
+
         postUlEl.append(postLiEl);
       });
       break;

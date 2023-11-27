@@ -13,6 +13,7 @@ export default {
       rss: {
         feeds: 'Фиды',
         posts: 'Посты',
+        viewBtn: 'Просмотр',
       },
     },
   },
