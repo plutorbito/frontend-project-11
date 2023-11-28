@@ -15,6 +15,7 @@ const elements = {
   feedbackEl: document.querySelector('.feedback'),
   feedsEl: document.querySelector('.feeds'),
   postsEl: document.querySelector('.posts'),
+  modalEl: document.getElementById('modal'),
 };
 
 const state = {
@@ -22,6 +23,8 @@ const state = {
   feedback: '',
   feeds: [],
   posts: [],
+  modalPostId: null,
+  viewedPostIds: [],
 };
 
 const validate = (field, array) => {
@@ -45,7 +48,7 @@ const getFeedsWithIds = (feeds, feedId) => {
 const getPostsWithIds = (posts, feedId) => {
   return posts.map((post) => {
     const postId = _.uniqueId();
-    return { ...post, feedId: feedId, postid: postId };
+    return { ...post, feedId: feedId, postId: postId };
   });
 };
 
@@ -70,7 +73,10 @@ export default () => {
         },
       });
 
-      const watchedState = onChange(state, render(elements, i18nextInstance));
+      const watchedState = onChange(
+        state,
+        render(elements, i18nextInstance, state)
+      );
 
       const checkForNewPosts = () => {
         watchedState.feeds.forEach((feed) => {
@@ -88,7 +94,6 @@ export default () => {
                   feed.feedId
                 );
                 watchedState.posts.push(...newPostsWithIds);
-                render(elements, i18nextInstance);
               }
             })
             .catch((error) => handleErrors(error, watchedState));
@@ -126,6 +131,12 @@ export default () => {
           .then(() => {
             console.log(state);
           });
+      });
+
+      elements.modalEl.addEventListener('shown.bs.modal', (e) => {
+        const postId = e.relatedTarget.dataset.id;
+        watchedState.modalPostId = postId;
+        watchedState.viewedPostIds.push(postId);
       });
     });
 };

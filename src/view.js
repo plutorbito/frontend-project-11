@@ -15,6 +15,7 @@ const createCardElements = (container, i18nextInstance, title) => {
   cardBodyEl.append(cardTitle);
 
   const ulEl = document.createElement('ul');
+  ulEl.classList.add('list-group', 'border-0', 'rounded-0');
   cardEl.append(ulEl);
   return ulEl;
 };
@@ -30,7 +31,14 @@ const createBtn = (id, i18nextInstance) => {
   return btnEl;
 };
 
-export default (elements, i18nextInstance) => (path, value) => {
+const renderViewedPosts = (postsIds) =>
+  postsIds.forEach((postId) => {
+    const viewedPost = document.querySelector(`[data-id='${postId}']`);
+    viewedPost.classList.remove('fw-bold');
+    viewedPost.classList.add('fw-normal');
+  });
+
+export default (elements, i18nextInstance, state) => (path, value) => {
   const cardTitle = `rss.${path}`;
   switch (path) {
     case 'status':
@@ -38,8 +46,6 @@ export default (elements, i18nextInstance) => (path, value) => {
         elements.inputEl.classList.remove('is-invalid');
         elements.feedbackEl.classList.remove('text-danger');
         elements.feedbackEl.classList.add('text-success');
-        elements.formEl.reset();
-        elements.inputEl.focus();
       } else if (value === 'invalid') {
         elements.inputEl.classList.add('is-invalid');
         elements.feedbackEl.classList.remove('text-success');
@@ -52,6 +58,9 @@ export default (elements, i18nextInstance) => (path, value) => {
       break;
 
     case 'feeds':
+      elements.formEl.reset();
+      elements.inputEl.focus();
+
       const feedUlEl = createCardElements(
         elements.feedsEl,
         i18nextInstance,
@@ -107,6 +116,26 @@ export default (elements, i18nextInstance) => (path, value) => {
 
         postUlEl.append(postLiEl);
       });
+
+      renderViewedPosts(state.viewedPostIds);
+      break;
+
+    case 'modalPostId':
+      const modalHeader = modal.querySelector('.modal-header');
+      const modalBody = modal.querySelector('.modal-body');
+
+      const postDataToShow = state.posts.find((post) => post.postId === value);
+      const { postTitle, postDescription, postLink } = postDataToShow;
+
+      modalHeader.textContent = postTitle;
+      modalBody.textContent = postDescription;
+
+      const viewArticleBtn = modal.querySelector('.btn-primary');
+      viewArticleBtn.href = postLink;
+      break;
+
+    case 'viewedPostIds':
+      renderViewedPosts(value);
       break;
 
     default:
