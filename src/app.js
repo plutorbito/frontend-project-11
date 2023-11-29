@@ -127,10 +127,7 @@ export default () => {
                 handleErrors(error, watchedState);
               });
           })
-          .catch((error) => handleErrors(error, watchedState))
-          .then(() => {
-            console.log(state);
-          });
+          .catch((error) => handleErrors(error, watchedState));
       });
 
       elements.modalEl.addEventListener('show.bs.modal', (e) => {
