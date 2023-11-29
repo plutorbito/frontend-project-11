@@ -3,10 +3,10 @@ export default {
     translation: {
       validation: {
         default: 'Поле заполнено неверно',
-        required: 'Поле обязательно для заполнения',
+        required: 'Не должно быть пустым',
         notOneOf: 'RSS уже существует',
-        invalidUrl: 'Некорректный URL',
-        success: 'RSS успешно добавлен',
+        invalidUrl: 'Ссылка должна быть валидным URL',
+        success: 'RSS успешно загружен',
         invalidRss: 'Ресурс не содержит валидный RSS',
         connectionError: 'Ошибка сети',
       },
