@@ -31,8 +31,7 @@ const createBtn = (id, i18nextInstance) => {
   return btnEl;
 };
 
-const renderViewedPosts = (postsIds) =>
-  postsIds.forEach((postId) => {
+const renderViewedPosts = (postsIds) => postsIds.forEach((postId) => {
     const viewedPost = document.querySelector(`[data-id='${postId}']`);
     viewedPost.classList.remove('fw-bold');
     viewedPost.classList.add('fw-normal');

@@ -33,21 +33,20 @@ const validate = (field, array) => {
 };
 
 const handleErrors = (error, watchedState) => {
-  watchedState.status = 'invalid';
-  return error.name === 'AxiosError'
+  const feedback = error.name === 'AxiosError'
     ? (watchedState.feedback = 'validation.connectionError')
     : (watchedState.feedback = error.message);
+    watchedState.status = 'invalid';
+    return feedback;
 };
 
-const getFeedsWithIds = (feeds, feedId) =>
-  feeds.map((feed) => {
-    return { ...feed, feedId: feedId };
+const getFeedsWithIds = (feeds, feedId) => feeds.map((feed) => {
+    return { ...feed, feedId };
   });
 
-const getPostsWithIds = (posts, feedId) =>
-  posts.map((post) => {
+const getPostsWithIds = (posts, feedId) => posts.map((post) => {
     const postId = _.uniqueId();
-    return { ...post, feedId: feedId, postId: postId };
+    return { ...post, feedId, postId };
   });
 
 export default () => {
@@ -73,8 +72,7 @@ export default () => {
           .then((data) => {
             const { posts: newPosts } = parseDataFromUrl(data, feed.url);
             const filteredNewPosts = newPosts.filter(
-              (post) =>
-                !watchedState.posts.some((existingPost) => existingPost.postLink === post.postLink),
+              (post) => !watchedState.posts.some((existingPost) => existingPost.postLink === post.postLink),
             );
             if (filteredNewPosts.length > 0) {
               const newPostsWithIds = getPostsWithIds(filteredNewPosts, feed.feedId);
