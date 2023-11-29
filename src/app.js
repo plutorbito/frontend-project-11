@@ -42,10 +42,10 @@ const handleErrors = (error, watchedState) => {
 
 const getFeedsWithIds = (feeds, feedId) => feeds.map((feed) => ({ ...feed, feedId }));
 
-const getPostsWithIds = (posts, feedId) => posts.map((post) => ({ 
-  ...post, 
-  feedId, 
-  postId: _.uniqueId(), 
+const getPostsWithIds = (posts, feedId) => posts.map((post) => ({
+  ...post,
+  feedId,
+  postId: _.uniqueId(),
 }));
 
 export default () => {
@@ -73,8 +73,8 @@ export default () => {
             const filteredNewPosts = newPosts.filter(
               (post) => !watchedState.posts.some(
                 (existingPost) => existingPost.postLink === post.postLink,
-                ),
-              );
+              ),
+            );
             if (filteredNewPosts.length > 0) {
               const newPostsWithIds = getPostsWithIds(filteredNewPosts, feed.feedId);
               watchedState.posts.push(...newPostsWithIds);
