@@ -64,7 +64,7 @@ export default (elements, i18nextInstance, state) => (path, value) => {
       const feedUlEl = createCardElements(
         elements.feedsEl,
         i18nextInstance,
-        cardTitle
+        cardTitle,
       );
 
       value.forEach((el) => {
@@ -89,7 +89,7 @@ export default (elements, i18nextInstance, state) => (path, value) => {
       const postUlEl = createCardElements(
         elements.postsEl,
         i18nextInstance,
-        cardTitle
+        cardTitle,
       );
 
       value.forEach((el) => {
@@ -100,7 +100,7 @@ export default (elements, i18nextInstance, state) => (path, value) => {
           'justify-content-between',
           'align-items-start',
           'border-0',
-          'border-end-0'
+          'border-end-0',
         );
 
         const postAEl = document.createElement('a');
@@ -122,8 +122,8 @@ export default (elements, i18nextInstance, state) => (path, value) => {
       break;
 
     case 'modalPostId':
-      const modalHeader = modal.querySelector('.modal-header');
-      const modalBody = modal.querySelector('.modal-body');
+      const modalHeader = elements.modalEl.querySelector('.modal-header');
+      const modalBody = elements.modalEl.querySelector('.modal-body');
 
       const postDataToShow = state.posts.find((post) => post.postId === value);
       const { postTitle, postDescription, postLink } = postDataToShow;
@@ -131,7 +131,7 @@ export default (elements, i18nextInstance, state) => (path, value) => {
       modalHeader.textContent = postTitle;
       modalBody.textContent = postDescription;
 
-      const viewArticleBtn = modal.querySelector('.btn-primary');
+      const viewArticleBtn = elements.modalEl.querySelector('.btn-primary');
       viewArticleBtn.href = postLink;
       break;
 
