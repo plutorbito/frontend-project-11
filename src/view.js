@@ -32,10 +32,10 @@ const createBtn = (id, i18nextInstance) => {
 };
 
 const renderViewedPosts = (postsIds) => postsIds.forEach((postId) => {
-    const viewedPost = document.querySelector(`[data-id='${postId}']`);
-    viewedPost.classList.remove('fw-bold');
-    viewedPost.classList.add('fw-normal');
-  });
+  const viewedPost = document.querySelector(`[data-id='${postId}']`);
+  viewedPost.classList.remove('fw-bold');
+  viewedPost.classList.add('fw-normal');
+});
 
 export default (elements, i18nextInstance, state) => (path, value) => {
   const cardTitle = `rss.${path}`;

@@ -36,18 +36,18 @@ const handleErrors = (error, watchedState) => {
   const feedback = error.name === 'AxiosError'
     ? (watchedState.feedback = 'validation.connectionError')
     : (watchedState.feedback = error.message);
-    watchedState.status = 'invalid';
-    return feedback;
+  watchedState.status = 'invalid';
+  return feedback;
 };
 
 const getFeedsWithIds = (feeds, feedId) => feeds.map((feed) => {
-    return { ...feed, feedId };
-  });
+  return { ...feed, feedId };
+});
 
 const getPostsWithIds = (posts, feedId) => posts.map((post) => {
-    const postId = _.uniqueId();
-    return { ...post, feedId, postId };
-  });
+  const postId = _.uniqueId();
+  return { ...post, feedId, postId };
+});
 
 export default () => {
   const defaultLanguage = 'ru';
@@ -72,8 +72,8 @@ export default () => {
           .then((data) => {
             const { posts: newPosts } = parseDataFromUrl(data, feed.url);
             const filteredNewPosts = newPosts.filter(
-              (post) => !watchedState.posts.some((existingPost) => existingPost.postLink === post.postLink),
-            );
+              (post) => !watchedState.posts.some(
+                (existingPost) => existingPost.postLink === post.postLink));
             if (filteredNewPosts.length > 0) {
               const newPostsWithIds = getPostsWithIds(filteredNewPosts, feed.feedId);
               watchedState.posts.push(...newPostsWithIds);
