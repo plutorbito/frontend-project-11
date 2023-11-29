@@ -80,6 +80,7 @@ export default (elements, i18nextInstance, state) => (path, value) => {
         feedDescriptionEl.classList.add('m-0', 'small', 'text-black-50');
         feedDescriptionEl.textContent = el.feedDescription;
         feedLiEl.append(feedDescriptionEl);
+
         feedUlEl.append(feedLiEl);
       });
       break;
