@@ -133,7 +133,7 @@ export default () => {
           });
       });
 
-      elements.modalEl.addEventListener('shown.bs.modal', (e) => {
+      elements.modalEl.addEventListener('show.bs.modal', (e) => {
         const postId = e.relatedTarget.dataset.id;
         watchedState.modalPostId = postId;
         watchedState.viewedPostIds.push(postId);
