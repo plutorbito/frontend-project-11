@@ -40,7 +40,7 @@ const renderViewedPosts = (postsIds) => postsIds.forEach((postId) => {
 export default (elements, i18nextInstance, state) => (path, value) => {
   const cardTitle = `rss.${path}`;
   switch (path) {
-    case 'status':
+    case 'status': {
       if (value === 'valid') {
         elements.inputEl.classList.remove('is-invalid');
         elements.feedbackEl.classList.remove('text-danger');
@@ -51,12 +51,14 @@ export default (elements, i18nextInstance, state) => (path, value) => {
         elements.feedbackEl.classList.add('text-danger');
       }
       break;
+    }
 
-    case 'feedback':
+    case 'feedback': {
       elements.feedbackEl.textContent = i18nextInstance.t(value);
       break;
+    }
 
-    case 'feeds':
+    case 'feeds': {
       elements.formEl.reset();
       elements.inputEl.focus();
 
@@ -83,8 +85,9 @@ export default (elements, i18nextInstance, state) => (path, value) => {
         feedUlEl.append(feedLiEl);
       });
       break;
+    }
 
-    case 'posts':
+    case 'posts': {
       const postUlEl = createCardElements(
         elements.postsEl,
         i18nextInstance,
@@ -119,8 +122,9 @@ export default (elements, i18nextInstance, state) => (path, value) => {
 
       renderViewedPosts(state.viewedPostIds);
       break;
+    }
 
-    case 'modalPostId':
+    case 'modalPostId': {
       const modalHeader = elements.modalEl.querySelector('.modal-header');
       const modalBody = elements.modalEl.querySelector('.modal-body');
 
@@ -133,6 +137,7 @@ export default (elements, i18nextInstance, state) => (path, value) => {
       const viewArticleBtn = elements.modalEl.querySelector('.btn-primary');
       viewArticleBtn.href = postLink;
       break;
+    }
 
     case 'viewedPostIds':
       renderViewedPosts(value);
