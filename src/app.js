@@ -95,12 +95,14 @@ export default () => {
       const formData = new FormData(e.target);
       const url = formData.get('url');
       const urlsArray = watchedState.feeds.map((feed) => feed.url);
+      watchedState.feedback = '';
       validate(url, urlsArray)
         .then(() => {
+          watchedState.status = 'valid';
+
           getDataFromUrl(url)
             .then((data) => {
               watchedState.feedback = 'validation.success';
-              watchedState.status = 'valid';
 
               const { feeds, posts } = parseDataFromUrl(data, url);
               const feedId = _.uniqueId();
