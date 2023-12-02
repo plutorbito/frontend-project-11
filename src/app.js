@@ -26,6 +26,7 @@ const validate = (field, array) => {
 const setInvalidStatus = (watchedState) => (watchedState.status = 'invalid');
 
 const handleErrors = (error, watchedState) => {
+  setInvalidStatus(watchedState);
   const feedback = error.name === 'AxiosError'
     ? (watchedState.feedback = 'validation.connectionError')
     : (watchedState.feedback = error.message);
@@ -67,25 +68,23 @@ export default () => {
     const watchedState = onChange(state, view(elements, i18nextInstance, state));
 
     const checkForNewPosts = () => {
-      watchedState.feeds.forEach((feed) => {
-        getDataFromUrl(feed.url)
-          .then((data) => {
-            const { posts: newPosts } = parseDataFromUrl(data, feed.url);
-            const filteredNewPosts = newPosts.filter(
-              (post) => !watchedState.posts.some(
-                (existingPost) => existingPost.postLink === post.postLink,
-              ),
-            );
-            if (filteredNewPosts.length > 0) {
-              const newPostsWithIds = setPostsIds(filteredNewPosts, feed.feedId);
-              watchedState.posts.push(...newPostsWithIds);
-            }
-          })
-          .catch((error) => {
-            handleErrors(error, watchedState)
-          });
-      });
-      setTimeout(checkForNewPosts, 5000);
+      const promises = watchedState.feeds.map((feed) =>
+          getDataFromUrl(feed.url)
+            .then((data) => {
+              const { posts: currentPosts } = parseDataFromUrl(data, feed.url);
+              const newPosts = currentPosts.filter((post) => {
+                return !watchedState.posts.some(
+                  (existingPost) => existingPost.postLink === post.postLink
+                );
+              });
+              if (newPosts.length > 0) {
+                const newPostsWithIds = setPostsIds(newPosts, feed.feedId);
+                watchedState.posts.push(...newPostsWithIds);
+              }
+            })
+            .catch((error) => handleErrors(error, watchedState))
+        );
+        Promise.all(promises).then(() => setTimeout(checkForNewPosts, 5000));
     };
 
     checkForNewPosts();
@@ -113,12 +112,10 @@ export default () => {
               watchedState.posts.push(...postsWithIds);
             })
             .catch((error) => {
-              setInvalidStatus(watchedState)
               handleErrors(error, watchedState);
             });
         })
         .catch((error) => {
-          setInvalidStatus(watchedState)
           handleErrors(error, watchedState);
         });
     });
