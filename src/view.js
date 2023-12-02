@@ -37,6 +37,9 @@ const renderInputAndFeedbackStyle = (value, elements) => {
       elements.inputEl.classList.remove('is-invalid');
       elements.feedbackEl.classList.remove('text-danger');
       elements.feedbackEl.classList.add('text-success');
+
+      elements.formEl.reset();
+      elements.inputEl.focus();
       break;
     }
 
@@ -144,9 +147,6 @@ export default (elements, i18nextInstance, state) => (path, value) => {
     }
 
     case 'feeds': {
-      elements.formEl.reset();
-      elements.inputEl.focus();
-
       renderFeeds(value, elements, i18nextInstance, cardTitle);
       break;
     }
