@@ -75,8 +75,7 @@ export default () => {
           const { posts: currentPosts } = parseDataFromUrl(data, feed.url);
           const newPosts = currentPosts.filter((post) => !watchedState.posts.some(
             (existingPost) => existingPost.postLink === post.postLink,
-            ),
-          );
+          ));
           if (newPosts.length > 0) {
             const newPostsWithIds = setPostsIds(newPosts, feed.feedId);
             watchedState.posts.push(...newPostsWithIds);
