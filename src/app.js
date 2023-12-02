@@ -71,16 +71,17 @@ export default () => {
 
     const checkForNewPosts = () => {
       const promises = watchedState.feeds.map((feed) => getDataFromUrl(feed.url)
-          .then((data) => {
-            const { posts: currentPosts } = parseDataFromUrl(data, feed.url);
-            const newPosts = currentPosts.filter((post) => !watchedState.posts.some(
-              (existingPost) => existingPost.postLink === post.postLink));
-            if (newPosts.length > 0) {
-              const newPostsWithIds = setPostsIds(newPosts, feed.feedId);
-              watchedState.posts.push(...newPostsWithIds);
-            }
-          })
-          .catch((error) => handleErrors(error, watchedState)));
+        .then((data) => {
+          const { posts: currentPosts } = parseDataFromUrl(data, feed.url);
+          const newPosts = currentPosts.filter((post) => !watchedState.posts.some(
+            (existingPost) => existingPost.postLink === post.postLink)
+            );
+          if (newPosts.length > 0) {
+            const newPostsWithIds = setPostsIds(newPosts, feed.feedId);
+            watchedState.posts.push(...newPostsWithIds);
+          }
+        })
+        .catch((error) => handleErrors(error, watchedState)));
       Promise.all(promises).then(() => setTimeout(checkForNewPosts, 5000));
     };
 
