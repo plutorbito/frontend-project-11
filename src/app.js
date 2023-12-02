@@ -23,7 +23,9 @@ const validate = (field, array) => {
   return schema.validate(field);
 };
 
-const setInvalidStatus = (watchedState) => (watchedState.status = 'invalid');
+const setInvalidStatus = (watchedState) => {
+  watchedState.status = 'invalid';
+};
 
 const handleErrors = (error, watchedState) => {
   setInvalidStatus(watchedState);
@@ -68,23 +70,18 @@ export default () => {
     const watchedState = onChange(state, view(elements, i18nextInstance, state));
 
     const checkForNewPosts = () => {
-      const promises = watchedState.feeds.map((feed) =>
-          getDataFromUrl(feed.url)
-            .then((data) => {
-              const { posts: currentPosts } = parseDataFromUrl(data, feed.url);
-              const newPosts = currentPosts.filter((post) => {
-                return !watchedState.posts.some(
-                  (existingPost) => existingPost.postLink === post.postLink
-                );
-              });
-              if (newPosts.length > 0) {
-                const newPostsWithIds = setPostsIds(newPosts, feed.feedId);
-                watchedState.posts.push(...newPostsWithIds);
-              }
-            })
-            .catch((error) => handleErrors(error, watchedState))
-        );
-        Promise.all(promises).then(() => setTimeout(checkForNewPosts, 5000));
+      const promises = watchedState.feeds.map((feed) => getDataFromUrl(feed.url)
+          .then((data) => {
+            const { posts: currentPosts } = parseDataFromUrl(data, feed.url);
+            const newPosts = currentPosts.filter((post) => !watchedState.posts.some(
+              (existingPost) => existingPost.postLink === post.postLink));
+            if (newPosts.length > 0) {
+              const newPostsWithIds = setPostsIds(newPosts, feed.feedId);
+              watchedState.posts.push(...newPostsWithIds);
+            }
+          })
+          .catch((error) => handleErrors(error, watchedState)));
+      Promise.all(promises).then(() => setTimeout(checkForNewPosts, 5000));
     };
 
     checkForNewPosts();
