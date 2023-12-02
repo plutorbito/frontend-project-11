@@ -4,19 +4,10 @@ import * as yup from 'yup';
 import onChange from 'on-change';
 import i18next from 'i18next';
 import _ from 'lodash';
-import render from './view.js';
+import view from './view.js';
 import resources from './locales/ru.js';
 import getDataFromUrl from './getDataFromUrl.js';
 import parseDataFromUrl from './parseDataFromUrl.js';
-
-const elements = {
-  formEl: document.querySelector('.rss-form'),
-  inputEl: document.querySelector('#url-input'),
-  feedbackEl: document.querySelector('.feedback'),
-  feedsEl: document.querySelector('.feeds'),
-  postsEl: document.querySelector('.posts'),
-  modalEl: document.getElementById('modal'),
-};
 
 const state = {
   status: '',
@@ -32,23 +23,33 @@ const validate = (field, array) => {
   return schema.validate(field);
 };
 
+const setInvalidStatus = (watchedState) => (watchedState.status = 'invalid');
+
 const handleErrors = (error, watchedState) => {
   const feedback = error.name === 'AxiosError'
     ? (watchedState.feedback = 'validation.connectionError')
     : (watchedState.feedback = error.message);
-  watchedState.status = 'invalid';
   return feedback;
 };
 
-const getFeedsWithIds = (feeds, feedId) => feeds.map((feed) => ({ ...feed, feedId }));
+const setFeedsIds = (feeds, feedId) => feeds.map((feed) => ({ ...feed, feedId }));
 
-const getPostsWithIds = (posts, feedId) => posts.map((post) => ({
+const setPostsIds = (posts, feedId) => posts.map((post) => ({
   ...post,
   feedId,
   postId: _.uniqueId(),
 }));
 
 export default () => {
+  const elements = {
+    formEl: document.querySelector('.rss-form'),
+    inputEl: document.querySelector('#url-input'),
+    feedbackEl: document.querySelector('.feedback'),
+    feedsEl: document.querySelector('.feeds'),
+    postsEl: document.querySelector('.posts'),
+    modalEl: document.getElementById('modal'),
+  };
+
   const defaultLanguage = 'ru';
   const i18nextInstance = i18next.createInstance();
   i18nextInstance.init({ lng: defaultLanguage, debug: false, resources }).then(() => {
@@ -63,7 +64,7 @@ export default () => {
       },
     });
 
-    const watchedState = onChange(state, render(elements, i18nextInstance, state));
+    const watchedState = onChange(state, view(elements, i18nextInstance, state));
 
     const checkForNewPosts = () => {
       watchedState.feeds.forEach((feed) => {
@@ -76,11 +77,13 @@ export default () => {
               ),
             );
             if (filteredNewPosts.length > 0) {
-              const newPostsWithIds = getPostsWithIds(filteredNewPosts, feed.feedId);
+              const newPostsWithIds = setPostsIds(filteredNewPosts, feed.feedId);
               watchedState.posts.push(...newPostsWithIds);
             }
           })
-          .catch((error) => handleErrors(error, watchedState));
+          .catch((error) => {
+            handleErrors(error, watchedState)
+          });
       });
       setTimeout(checkForNewPosts, 5000);
     };
@@ -101,17 +104,21 @@ export default () => {
 
               const { feeds, posts } = parseDataFromUrl(data, url);
               const feedId = _.uniqueId();
-              const feedsWithIds = getFeedsWithIds(feeds, feedId);
-              const postsWithIds = getPostsWithIds(posts, feedId);
+              const feedsWithIds = setFeedsIds(feeds, feedId);
+              const postsWithIds = setPostsIds(posts, feedId);
 
               watchedState.feeds.push(...feedsWithIds);
               watchedState.posts.push(...postsWithIds);
             })
             .catch((error) => {
+              setInvalidStatus(watchedState)
               handleErrors(error, watchedState);
             });
         })
-        .catch((error) => handleErrors(error, watchedState));
+        .catch((error) => {
+          setInvalidStatus(watchedState)
+          handleErrors(error, watchedState);
+        });
     });
 
     elements.modalEl.addEventListener('show.bs.modal', (e) => {
