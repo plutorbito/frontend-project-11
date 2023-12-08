@@ -33,13 +33,18 @@ const createBtn = (id, i18nextInstance) => {
 
 const renderInputAndFeedbackStyle = (value, elements) => {
   switch (value) {
-    case 'valid': {
+    case 'uploaded': {
       elements.inputEl.classList.remove('is-invalid');
       elements.feedbackEl.classList.remove('text-danger');
       elements.feedbackEl.classList.add('text-success');
 
       elements.formEl.reset();
       elements.inputEl.focus();
+      break;
+    }
+
+    case 'valid': {
+      elements.feedbackEl.textContent = '';
       break;
     }
 
