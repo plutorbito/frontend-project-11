@@ -31,8 +31,8 @@ const validate = (field, array) => {
 
 const handleErrors = (error, watchedState) => {
   watchedState.form.feedback = error.name === 'AxiosError'
-  ? 'validation.connectionError' : error.message;
-}
+    ? 'validation.connectionError' : error.message;
+};
 
 const setFeedId = (feed, feedId) => {
   feed.feedId = feedId;
