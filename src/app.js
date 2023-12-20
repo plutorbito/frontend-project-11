@@ -34,11 +34,9 @@ const setInvalidStatus = (watchedState) => {
 };
 
 const handleErrors = (error, watchedState) => {
-  setInvalidStatus(watchedState);
-  const feedback = error.name === 'AxiosError'
-    ? (watchedState.form.feedback = 'validation.connectionError')
-    : (watchedState.form.feedback = error.message);
-  return feedback;
+  return watchedState.feedback = error.name === 'AxiosError' 
+    ? 'validation.connectionError' 
+    : error.message;
 };
 
 const setFeedId = (feed, feedId) => {
@@ -120,9 +118,13 @@ export default () => {
             })
             .catch((error) => {
               handleErrors(error, watchedState);
+              watchedState.form.status = 'invalid';
             });
         })
-        .catch((error) => handleErrors(error, watchedState));
+        .catch((error) => {
+          handleErrors(error, watchedState);
+          watchedState.form.status = 'invalid';
+        });
     });
 
     elements.modalEl.addEventListener('show.bs.modal', (e) => {
