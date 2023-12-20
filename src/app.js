@@ -10,12 +10,18 @@ import getDataFromUrl from './getDataFromUrl.js';
 import parseDataFromUrl from './parseDataFromUrl.js';
 
 const state = {
-  status: '',
-  feedback: '',
-  feeds: [],
-  posts: [],
-  modalPostId: null,
-  viewedPostIds: [],
+  form: {
+    status: '',
+    feedback: '',
+  },
+  data: {
+    feeds: [],
+    posts: [],
+    viewedPostIds: [],
+  },
+  ui: {
+    modalPostId: null,
+  },
 };
 
 const validate = (field, array) => {
@@ -24,14 +30,14 @@ const validate = (field, array) => {
 };
 
 const setInvalidStatus = (watchedState) => {
-  watchedState.status = 'invalid';
+  watchedState.form.status = 'invalid';
 };
 
 const handleErrors = (error, watchedState) => {
   setInvalidStatus(watchedState);
   const feedback = error.name === 'AxiosError'
-    ? (watchedState.feedback = 'validation.connectionError')
-    : (watchedState.feedback = error.message);
+    ? (watchedState.form.feedback = 'validation.connectionError')
+    : (watchedState.form.feedback = error.message);
   return feedback;
 };
 
@@ -73,15 +79,15 @@ export default () => {
     const watchedState = onChange(state, view(elements, i18nextInstance, state));
 
     const checkForNewPosts = () => {
-      const promises = watchedState.feeds.map((feed) => getDataFromUrl(feed.url)
+      const promises = watchedState.data.feeds.map((feed) => getDataFromUrl(feed.url)
         .then((data) => {
           const { posts: currentPosts } = parseDataFromUrl(data, feed.url);
-          const newPosts = currentPosts.filter((post) => !watchedState.posts.some(
+          const newPosts = currentPosts.filter((post) => !watchedState.data.posts.some(
             (existingPost) => existingPost.postLink === post.postLink,
           ));
           if (newPosts.length > 0) {
             const newPostsWithIds = setPostsIds(newPosts, feed.feedId);
-            watchedState.posts.push(...newPostsWithIds);
+            watchedState.data.posts.push(...newPostsWithIds);
           }
         })
         .catch((error) => handleErrors(error, watchedState)));
@@ -94,23 +100,22 @@ export default () => {
       e.preventDefault();
       const formData = new FormData(e.target);
       const url = formData.get('url');
-      const urlsArray = watchedState.feeds.map((feed) => feed.url);
+      const urlsArray = watchedState.data.feeds.map((feed) => feed.url);
       validate(url, urlsArray)
         .then(() => {
-          watchedState.status = 'valid';
+          watchedState.form.status = 'valid';
           getDataFromUrl(url)
             .then((data) => {
-              watchedState.feedback = 'validation.success';
-              watchedState.status = 'uploaded';
-              console.log(state);
+              watchedState.form.feedback = 'validation.success';
+              watchedState.form.status = 'uploaded';
 
               const { feed, posts } = parseDataFromUrl(data, url);
               const feedId = _.uniqueId();
               const feedWithId = setFeedId(feed, feedId);
               const postsWithIds = setPostsIds(posts, feedId);
 
-              watchedState.feeds.push(feedWithId);
-              watchedState.posts.push(...postsWithIds);
+              watchedState.data.feeds.push(feedWithId);
+              watchedState.data.posts.push(...postsWithIds);
             })
             .catch((error) => {
               handleErrors(error, watchedState);
@@ -121,8 +126,8 @@ export default () => {
 
     elements.modalEl.addEventListener('show.bs.modal', (e) => {
       const postId = e.relatedTarget.dataset.id;
-      watchedState.modalPostId = postId;
-      watchedState.viewedPostIds.push(postId);
+      watchedState.ui.modalPostId = postId;
+      watchedState.data.viewedPostIds.push(postId);
     });
   });
 };

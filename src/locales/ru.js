@@ -11,9 +11,11 @@ export default {
         connectionError: 'Ошибка сети',
       },
       rss: {
-        feeds: 'Фиды',
-        posts: 'Посты',
-        viewBtn: 'Просмотр',
+        data: {
+          feeds: 'Фиды',
+          posts: 'Посты',
+          viewBtn: 'Просмотр',
+        },
       },
     },
   },

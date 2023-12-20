@@ -27,7 +27,7 @@ const createBtn = (id, i18nextInstance) => {
   btnEl.dataset.id = id;
   btnEl.dataset.bsToggle = 'modal';
   btnEl.dataset.bsTarget = '#modal';
-  btnEl.textContent = i18nextInstance.t('rss.viewBtn');
+  btnEl.textContent = i18nextInstance.t('rss.data.viewBtn');
   return btnEl;
 };
 
@@ -129,7 +129,7 @@ const renderModalWindow = (value, elements, state) => {
   const modalHeader = elements.modalEl.querySelector('.modal-header');
   const modalBody = elements.modalEl.querySelector('.modal-body');
 
-  const postDataToShow = state.posts.find((post) => post.postId === value);
+  const postDataToShow = state.data.posts.find((post) => post.postId === value);
   const { postTitle, postDescription, postLink } = postDataToShow;
 
   modalHeader.textContent = postTitle;
@@ -142,30 +142,30 @@ const renderModalWindow = (value, elements, state) => {
 export default (elements, i18nextInstance, state) => (path, value) => {
   const cardTitle = `rss.${path}`;
   switch (path) {
-    case 'status':
+    case 'form.status':
       renderInputAndFeedbackStyle(value, elements);
       break;
 
-    case 'feedback': {
+    case 'form.feedback': {
       elements.feedbackEl.textContent = i18nextInstance.t(value);
       break;
     }
 
-    case 'feeds': {
+    case 'data.feeds': {
       renderFeeds(value, elements, i18nextInstance, cardTitle);
       break;
     }
 
-    case 'posts':
+    case 'data.posts':
       renderNewPosts(value, elements, i18nextInstance, cardTitle);
-      renderViewedPosts(state.viewedPostIds);
+      renderViewedPosts(state.data.viewedPostIds);
       break;
 
-    case 'modalPostId':
+    case 'ui.modalPostId':
       renderModalWindow(value, elements, state);
       break;
 
-    case 'viewedPostIds':
+    case 'data.viewedPostIds':
       renderViewedPosts(value);
       break;
 
