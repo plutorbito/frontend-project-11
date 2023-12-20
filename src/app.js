@@ -79,6 +79,7 @@ export default () => {
     const watchedState = onChange(state, view(elements, i18nextInstance, state));
 
     const checkForNewPosts = () => {
+      const timeOutInterval = 5000;
       const promises = watchedState.data.feeds.map((feed) => getDataFromUrl(feed.url)
         .then((data) => {
           const { posts: currentPosts } = parseDataFromUrl(data, feed.url);
@@ -91,7 +92,7 @@ export default () => {
           }
         })
         .catch((error) => handleErrors(error, watchedState)));
-      Promise.all(promises).then(() => setTimeout(checkForNewPosts, 5000));
+      Promise.all(promises).then(() => setTimeout(checkForNewPosts, timeOutInterval));
     };
 
     checkForNewPosts();
