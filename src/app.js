@@ -91,7 +91,7 @@ export default () => {
             watchedState.data.posts.push(...newPostsWithIds);
           }
         })
-        .catch((error) => handleErrors(error, watchedState)));
+        .catch((error) => console.log(error.message)));
       Promise.all(promises).then(() => setTimeout(checkForNewPosts, timeOutInterval));
     };
 
