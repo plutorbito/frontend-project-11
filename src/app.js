@@ -29,8 +29,8 @@ const validate = (field, array) => {
   return schema.validate(field);
 };
 
-const handleErrors = (error, watchedState) =>
-(watchedState.form.feedback = error.name === 'AxiosError' ? 'validation.connectionError' : error.message);
+const handleErrors = (error, watchedState) => (watchedState.form.feedback = error.name === 'AxiosError' 
+  ? 'validation.connectionError' : error.message);
 
 const setFeedId = (feed, feedId) => {
   feed.feedId = feedId;
