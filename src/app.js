@@ -29,12 +29,8 @@ const validate = (field, array) => {
   return schema.validate(field);
 };
 
-const setInvalidStatus = (watchedState) => {
-  watchedState.form.status = 'invalid';
-};
-
 const handleErrors = (error, watchedState) => {
-  return watchedState.feedback = error.name === 'AxiosError' 
+  return watchedState.form.feedback = error.name === 'AxiosError' 
     ? 'validation.connectionError' 
     : error.message;
 };
